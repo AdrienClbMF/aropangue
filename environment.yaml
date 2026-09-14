@@ -1,0 +1,8 @@
+name: aropang_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - meteofetch=0.5.6
+  - xarray=2026.7.0
+  - nbstripout
