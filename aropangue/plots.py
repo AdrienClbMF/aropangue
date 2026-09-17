@@ -3,15 +3,18 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
-def plot_tv_difference_hovmoller(tv, u, v, add_windbarbs: bool = True):
+def plot_tv_difference_hovmoller(tv_diff, u, v, add_windbarbs: bool = True, pointname:str = 'Unknown'):
 
-    times = tv["time"].values
-    heights = tv["heightAboveGround"].values
+    times = tv_diff["time"].values
+    heights = tv_diff["heightAboveGround"].values
 
-    # Convert times to matplotlib dates
-    time_num = mdates.date2num(times)
+    # UTC -> local time (Réunion, UTC+4), for plotting only
+    time_local = times + np.timedelta64(4, "h")
 
-    # Cell edges: centers are at the actual time/height coordinates
+    # Convert local times to matplotlib dates
+    time_num = mdates.date2num(time_local)
+
+    # Cell edges: centers are at the local time coordinates
     time_edges = np.empty(len(time_num) + 1)
     time_edges[1:-1] = (time_num[:-1] + time_num[1:]) / 2
     time_edges[0] = time_num[0] - (time_num[1] - time_num[0]) / 2
@@ -23,13 +26,14 @@ def plot_tv_difference_hovmoller(tv, u, v, add_windbarbs: bool = True):
     height_edges[-1] = heights[-1] + (heights[-1] - heights[-2]) / 2
 
     fig, ax = plt.subplots(figsize=(14, 7))
+
     cmap = plt.cm.YlOrRd.copy()
     cmap.set_under("white")
-    # Hovmöller field
+
     mesh = ax.pcolormesh(
         time_edges,
         height_edges,
-        tv.T,
+        tv_diff.T,
         shading="flat",
         cmap=cmap,
         vmin=0,
@@ -40,7 +44,7 @@ def plot_tv_difference_hovmoller(tv, u, v, add_windbarbs: bool = True):
     cbar.set_label("Virtual temperature difference (K)")
 
     # Wind barbs
-    if add_windbarbs :
+    if add_windbarbs:
         T, H = np.meshgrid(time_num, heights, indexing="ij")
 
         step_time = 2
@@ -54,13 +58,14 @@ def plot_tv_difference_hovmoller(tv, u, v, add_windbarbs: bool = True):
             length=6,
         )
 
-    ax.set_xlabel("Time")
+    ax.set_xlabel("Local time (UTC+4)")
     ax.set_ylabel("Height above ground (m)")
-    ax.set_title(f"Virtual temperature difference and wind — {point}")
+    ax.set_title(f"Virtual temperature difference and wind — {pointname}")
 
     ax.xaxis_date()
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b\n%H:%M"))
     fig.autofmt_xdate()
 
     plt.tight_layout()
+
     return fig, ax
