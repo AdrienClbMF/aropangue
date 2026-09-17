@@ -21,8 +21,8 @@ def extend_elevation_by_dry_adiab(
 
     elevation_da = xr.DataArray(
         np.array(elevations) * elevation_units,
-        dims="elevation",
-        coords={"elevation": elevations},
+        dims="heightAboveGround",
+        coords={"heightAboveGround": elevations},
     )
 
     # zeros_like sur le DataArray NON quantifié -> pas d'unité de température héritée
@@ -41,3 +41,26 @@ def extend_elevation_by_dry_adiab(
     dry_adiabatic_temp.name = "temp_dry_adiabatic"
 
     return dry_adiabatic_temp
+
+
+def add_specific_and_virtual_temperature(datasets_3d):
+    """Compute specific humidity and virtual temperature 
+    from RH, T and pressure."""
+    e_s = mpcalc.saturation_vapor_pressure(datasets_3d["t"])
+    e = datasets_3d["r"] / 100 * e_s
+
+    mixing_ratio = mpcalc.mixing_ratio(
+        e,
+        datasets_3d["pres"],
+    )
+
+    datasets_3d["q"] = mpcalc.specific_humidity_from_mixing_ratio(
+        mixing_ratio
+    )
+
+    datasets_3d["Tv"] = mpcalc.virtual_temperature(
+        datasets_3d["t"],
+        datasets_3d["q"],
+    )
+
+    return datasets_3d
