@@ -40,7 +40,8 @@ def extend_elevation_by_dry_adiab(
     dry_adiabatic_temp = dry_adiabatic_temp.metpy.dequantify()
     dry_adiabatic_temp.name = "temp_dry_adiabatic"
 
-    return dry_adiabatic_temp
+    return dry_adiabatic_temp.metpy.quantify()
+
 
 
 def add_specific_and_virtual_temperature(datasets_3d):
@@ -64,3 +65,11 @@ def add_specific_and_virtual_temperature(datasets_3d):
     )
 
     return datasets_3d
+
+def get_lcl_ceiling(datasets_surf) :
+    lcl_pressure, _ = mpcalc.lcl(
+        datasets_surf['sp'], 
+        datasets_surf['t'], 
+        datasets_surf['d2m'])
+    
+    return mpcalc.pressure_to_height_std(lcl_pressure).to("m")
