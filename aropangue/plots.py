@@ -1,7 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib.colors import LinearSegmentedColormap
 
+CMAP_TI = LinearSegmentedColormap.from_list(
+    "thermal",
+    [
+        (0.00, "white"),
+        (0.20, "white"),
+        (0.30, "lightyellow"),
+        (0.50, "gold"),
+        (0.70, "orange"),
+        (0.85, "orangered"),
+        (1.00, "darkred"),
+    ],
+)
+CMAP_TI.set_under("white")
 
 def plot_tv_difference_hovmoller(tv_diff, u, v, add_windbarbs: bool = True, pointname:str = 'Unknown'):
 
@@ -27,15 +41,13 @@ def plot_tv_difference_hovmoller(tv_diff, u, v, add_windbarbs: bool = True, poin
 
     fig, ax = plt.subplots(figsize=(14, 7))
 
-    cmap = plt.cm.YlOrRd.copy()
-    cmap.set_under("white")
 
     mesh = ax.pcolormesh(
         time_edges,
         height_edges,
         tv_diff.T,
         shading="flat",
-        cmap=cmap,
+        cmap=CMAP_TI,
         vmin=0,
         vmax=5,
     )
