@@ -3,12 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
-def plot_tv_difference_hovmoller(tv, u, v, point="Colimacons", add_windbarbs: bool = True):
-
-    # Select point
-    tv = tv.sel(point=point)
-    u = u.sel(point=point)
-    v = v.sel(point=point)
+def plot_tv_difference_hovmoller(tv, u, v, add_windbarbs: bool = True):
 
     times = tv["time"].values
     heights = tv["heightAboveGround"].values
@@ -28,16 +23,17 @@ def plot_tv_difference_hovmoller(tv, u, v, point="Colimacons", add_windbarbs: bo
     height_edges[-1] = heights[-1] + (heights[-1] - heights[-2]) / 2
 
     fig, ax = plt.subplots(figsize=(14, 7))
-
+    cmap = plt.cm.YlOrRd.copy()
+    cmap.set_under("white")
     # Hovmöller field
     mesh = ax.pcolormesh(
         time_edges,
         height_edges,
         tv.T,
         shading="flat",
-        cmap="YlOrRd",
+        cmap=cmap,
         vmin=0,
-        vmax=20,
+        vmax=5,
     )
 
     cbar = fig.colorbar(mesh, ax=ax)
@@ -67,5 +63,4 @@ def plot_tv_difference_hovmoller(tv, u, v, point="Colimacons", add_windbarbs: bo
     fig.autofmt_xdate()
 
     plt.tight_layout()
-    plt.show()
     return fig, ax
