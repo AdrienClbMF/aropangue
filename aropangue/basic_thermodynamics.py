@@ -68,8 +68,8 @@ def add_specific_and_virtual_temperature(datasets_3d):
 
 def get_lcl_ceiling(datasets_surf) :
     lcl_pressure, _ = mpcalc.lcl(
-        datasets_surf['sp'], 
-        datasets_surf['t'], 
-        datasets_surf['d2m'])
+        datasets_surf['sp'].metpy.quantify(), 
+        datasets_surf['t'].metpy.quantify(), 
+        datasets_surf['d2m'].metpy.quantify())
     
     return mpcalc.pressure_to_height_std(lcl_pressure).to("m")
