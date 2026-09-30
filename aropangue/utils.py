@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import Literal
+from pathlib import Path
 from .settings import DATA_DIR
 from .format import parse_arch_filename
 
@@ -24,3 +25,9 @@ def list_available_model_arch(
         )
     else : 
         return pd.DataFrame()
+
+def clean_up_dir(dirpath: Path) -> None:
+    """Remove all NetCDF and GRIB2 files from a directory."""
+    for pattern in ("*.nc", "*.grib2"):
+        for filepath in dirpath.glob(pattern):
+            filepath.unlink()
