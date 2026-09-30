@@ -317,15 +317,16 @@ def plot_3d_clouds_hovmoller(rh_3d, lcl = None, pointname: str = 'Unknown'):
     )
 
     if lcl is not None :
-        ax.plot(
-            lcl["valid_time"].values + np.timedelta64(4, "h"),
-            lcl.values,
-            color="red",
-            linestyle="--",
-            linewidth=2,
-            label="LCL",
-            zorder=4,
-        )
+        for t, y in zip(times, lcl.values):
+            ax.hlines(
+                y=y,
+                xmin=t - np.timedelta64(30, "m"),
+                xmax=t + np.timedelta64(30, "m"),
+                color="red",
+                linestyle="-",
+                linewidth=2,
+                zorder=6,
+            )
     
     plt.setp(ax.get_xticklabels(), rotation=30, ha="right", rotation_mode="anchor")
     plt.tight_layout()
