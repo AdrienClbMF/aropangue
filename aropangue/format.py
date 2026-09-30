@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, Literal
+import xarray as xr
 from meteofetch import AromeOutreMerIndien
 
 DAT_FILENAME_FMT = "%Y-%m-%dT%H-%M-%SZ"
@@ -50,7 +51,8 @@ def subset_grib_to_netcdf(
 
     lon_min, lon_max, lat_min, lat_max = bbox
 
-    ds = model._read_grib(grib_path)[0]
+    datasets = model._read_grib(grib_path)
+    ds = xr.merge(datasets)
 
     # Latitude is decreasing in the AROME grid
     ds = ds.sel(
